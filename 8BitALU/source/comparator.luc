@@ -1,0 +1,22 @@
+module comparator (
+    input z, //the inputs to the comparator
+    input n,
+    input v,
+    input alufn[2], //2bit ALUFN signal, specifically ALUFN[1] and ALUFN[2] 
+    output out
+  ) {
+
+  always {
+    out = 0;
+    if (alufn == 2b01){ //to compare A == B
+      out = z;
+    }
+    if (alufn == 2b10){ //to compare A<B
+      out = n^v;
+    }
+    if (alufn == 2b11){ //to compare A<=B
+      out = z | (n^v);
+}
+  }
+  
+}
