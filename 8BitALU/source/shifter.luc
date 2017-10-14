@@ -1,0 +1,11 @@
+module shifter (
+    input alufn[2],
+    input a[32],
+    input b[5],
+    output out[32]
+  ) {
+
+  always {
+    out = 0;
+  }
+}

@@ -1,0 +1,11 @@
+module bool (
+    input alufn[4],
+    input a[32],
+    input b[32],
+    output out[32]
+  ) {
+
+  always {
+    out = 32hFFFFFFFF;
+  }
+}
