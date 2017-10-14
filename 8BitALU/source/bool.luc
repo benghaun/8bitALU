@@ -1,7 +1,7 @@
 module bool (
     input alufn[4],
-    input a[32],
-    input b[32],
+    input a[8],
+    input b[8],
     output out[32]
   ) {
 
