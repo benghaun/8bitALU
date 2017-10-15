@@ -2,52 +2,99 @@ module testSM ( //module containing state machine for automatic testing of the A
     input clk,  // clock
     input rst,  // reset
     input result[8], //input of result for checking
-    output alufn[6],
+    output alufn[6],//outputs of ALUFN, A and B which will be input into the ALU for testing
     output a[8],
-    output b[8]
+    output b[8],
+    input pause, //check if pause button is pressed
+    output error //output to indicate if there the error state is reached
   ) {
 .clk(clk){
   .rst(rst){
-    dff counter[27];
-    fsm state = {ADD,SUB,CMPEQT,CMPEQF,CMPLTT,CMPLTF,CMPLET,CMPLEF,AND,OR,XOR,A,SHL,SHR,SRA,ERROR}; 
+    dff counter[27]; //counter to keep track of time
+    fsm state = {ADD,ADDV,ADDZ,SUB,SUBZ,CMPEQT,CMPEQF,CMPLTT,CMPLTF,CMPLET,CMPLEF,AND,OR,XOR,A,SHL,SHR,SRA,ERROR}; //different states to test different functions of ALU
     }
   }
   always {
     alufn = 6b000000;
-    a = 8hFF;
-    b = 8hFF;
-    counter.d = counter.q+1;
+    a = 8h00;
+    b = 8h00;
+    error = 0;
+    if (!pause){//increase counter by 1 every clock cycle if pause button isn't pressed
+      counter.d = counter.q+1; 
+    }
     
     case (state.q){
       state.ADD: //state for testing addition
         alufn = 6b000000;
         a = 8h1E;
         b = 8h37;
-        if (counter.q[26]==1){
-          if (result==8h55){
-          state.d = state.SUB;
-          counter.d = 27h0000000;
+        if (counter.q[26]==1){ //MSB of counter is 1, 2^27 clock cycles (approx 2.7s) has passed
+          if (result==8h55){ //change state to next state if result is correct
+          state.d = state.ADDV;
+          counter.d = 27h0000000; //reset counter to 0
           }
-          else{
+          else{ //go to error state if result is wrong
           state.d = state.ERROR;
         }
         }
       
+      state.ADDV: //state for testing addition with overflow
+        alufn = 6b000000;
+        a = 8hF1;
+        b = 8hEE;
+        if (counter.q[26]==1){
+          if (result==8hDF){
+            state.d = state.ADDZ;
+            counter.d = 27h0000000;
+            }  
+          else{
+            state.d = state.ERROR;
+            }
+        }
+        
+      state.ADDZ: //state for testing addition of two zeroes
+        alufn = 6b000000;
+        a = 8h00;
+        b = 8h00;
+        if (counter.q[26]==1){
+          if (result==8h00){
+            state.d = state.SUB;
+            counter.d = 27h0000000;
+          }
+          else{
+            state.d = state.ERROR;
+          }
+        }
+        
       state.SUB: //state for testing subtraction
         alufn = 6b000001;
         a = 8h55;
         b = 8h1E;
         if (counter.q[26]==1){
           if (result==8h37){
-            state.d = state.CMPEQT;
+            state.d = state.SUBZ;
             counter.d = 27h0000000;
-            }
+            }  
           else{
             state.d = state.ERROR;
             }
         }
+        
+      state.SUBZ: //state for testing subtraction of two zeroes
+        alufn = 6b000001;
+        a = 8h00;
+        b = 8h00;
+        if (counter.q[26]==1){
+          if (result==8h00){
+            state.d = state.CMPEQT;
+            counter.d = 27h0000000;
+          }
+          else{
+            state.d = state.ERROR;
+          }
+        }
       
-      state.CMPEQT: //state for testing cmpeq (true case)
+      state.CMPEQT: //state for testing CMPEQ (true case)
         alufn = 6b110011;
         a = 8hE0;
         b = 8hE0;
@@ -62,7 +109,7 @@ module testSM ( //module containing state machine for automatic testing of the A
         }
         
         
-      state.CMPEQF: //false case for cmpeq
+      state.CMPEQF: //false case for CMPEQ
         alufn = 6b110011;
         a = 8hFE;
         b = 8hE1;
@@ -76,7 +123,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
         
-      state.CMPLTT: //state for testing cmplt (true case)
+      state.CMPLTT: //state for testing CMPLT (true case)
         alufn = 6b110101;
         a = 8h1E;
         b = 8h55;
@@ -90,7 +137,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
        
-      state.CMPLTF: //false case for cmplt
+      state.CMPLTF: //false case for CMPLT
         alufn = 6b110101;
         a = 8hDE;
         b = 8hAD;
@@ -104,7 +151,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
         
-      state.CMPLET: //state for testing cmple (true case)
+      state.CMPLET: //state for testing CMPLE (true case)
         alufn = 6b110111;
         a = 8hC0;
         b = 8hC0;
@@ -118,7 +165,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
         
-      state.CMPLEF: //false case for cmple
+      state.CMPLEF: //false case for CMPLE
         alufn = 6b110111;
         a = 8hFE;
         b = 8hED;
@@ -132,7 +179,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
     
-      state.AND:
+      state.AND: //state for testing AND
         alufn = 6b011000;
         a=8b10010110;
         b=8b00110101;
@@ -146,7 +193,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
         
-      state.OR:
+      state.OR: //state for testing OR
         alufn = 6b011110;
         a = 8b10110010;
         b = 8b00110100;
@@ -160,7 +207,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
         
-      state.XOR:
+      state.XOR: //state for testing XOR
         alufn = 6b010110;
         a = 8b11010110;
         b = 8b01100101;
@@ -174,7 +221,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
         
-      state.A:
+      state.A: //state for testing A
         alufn = 6b011010;
         a = 8b01100110;
         b = 8b11011100;
@@ -188,7 +235,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
         
-      state.SHL:
+      state.SHL: //state for testing left shift
         alufn = 6b100000;
         a = 8h1E;
         b = 8hff; 
@@ -202,7 +249,7 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
         
-      state.SHR:
+      state.SHR: //state for testing right shift
         alufn = 6b100001;
         a = 8hFA;
         b = 8h11; 
@@ -216,19 +263,22 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
         }
         
-      state.SRA:
+      state.SRA: //state for testing arithmetic right shift
         alufn = 6b100011;
         a = 8hF0;
         b = 8h0D;
         if (counter.q[26]==1){
           if (result == 8hF8){
-              state.d = state.SRA;
+              state.d = state.ADD; //this is the last state, go back to first state if successful
               counter.d = 27h0000000;
             }
             else{
               state.d = state.ERROR;
           }
         }
+        
+      state.ERROR: //error state
+        error = 1; //indicate that error state has been reached
         
         
         
