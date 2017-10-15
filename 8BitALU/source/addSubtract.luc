@@ -11,8 +11,12 @@ module addSubtract (
   ) {
   sig xb[8]; //XB input to adder
   sig s[8]; //S output of adder
+  var x; //variable for for loop
 
   always {
+    for (x = 0; x<7; x++){
+      xb[x] = b[x]^alufn0;
+    }
     xb = b^alufn0; //perform bitwise xor with ALUFN0 to invert if necessary
     s = a+xb+alufn0; //perform addition (or subtraction if ALUFN[0] is 1)
     out = s;
