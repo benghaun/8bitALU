@@ -1,11 +1,17 @@
 module bool (
-    input alufn[4],
-    input a[8],
-    input b[8],
-    output out[8]
+    input alufn[4], //4-bit alufn input signal specifically ALUFN0, ALUFN1, ALUFN2, ALUFN3 
+    input a[8],     //8-bit input A  
+    input b[8],     //8-bit input B  
+    output out[8]   //8-bit output out
   ) {
 
   always {
-    out = 8hFF;
+    case (alufn){           //Do note the order of the input bits and we are using switch statments to organize the code
+      4b0001: out = a&b;    //ALUFN[3:0] = 1000 corresponds to AND operation
+      4b0111: out = a|b;    //ALUFN[3:0] = 1110 corresponds to OR operations
+      4b0110: out = a^b;    //ALUFN[3:0] = 0110 corresponds to XOR operation
+      4b0101: out = a;      //ALUFN[3:0] = 1010 corresponds to 'A' operation
+      default: out = 8x{0}; //Default output
+    }
   }
 }
