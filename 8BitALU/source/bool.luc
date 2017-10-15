@@ -2,7 +2,7 @@ module bool (
     input alufn[4],
     input a[8],
     input b[8],
-    output out[32]
+    output out[8]
   ) {
 
   always {
