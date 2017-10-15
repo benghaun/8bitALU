@@ -18,18 +18,73 @@ module mojo_top (
     input io_dip [3][8]     // DIP switches on IO Shield
   ) {
   
-  sig rst;                  // reset signal
+  sig rst;       //reset signal
+  sig result[8]; //signal to store the value of the output from alu
   
   .clk(clk) {
     // The reset conditioner is used to synchronize the reset signal to the FPGA
     // clock. This ensures the entire FPGA comes out of reset at the same time.
     reset_conditioner reset_cond;
+    .rst(rst){
+      testSM testSM;
+      dff errorCounter[24]; //counter for LEDs to blink to indicate error
+    }
   }
+  addSubtract addSubtract; //subcircuits of ALU
+  bool bool;
+  comparator comparator;
+  shifter shifter;
+  
   
   always {
     reset_cond.in = ~rst_n; // input raw inverted reset signal
     rst = reset_cond.out;   // conditioned reset
     
+    //connect pause button to middle button in io shield
+    testSM.pause = io_button[1];
+    
+    //connect inputs to adder module
+    addSubtract.a = testSM.a;
+    addSubtract.b = testSM.b;
+    addSubtract.alufn0 = testSM.alufn[0];
+    addSubtract.error = io_button[0]; //button to press to cause error in adder
+    
+    //connect comparator to adder outputs
+    comparator.z = addSubtract.z; 
+    comparator.n = addSubtract.n;
+    comparator.v = addSubtract.v;
+    comparator.alufn = testSM.alufn[2:1];
+    
+    //connect inputs to bool moudule
+    bool.a = testSM.a;
+    bool.b = testSM.b;
+    bool.alufn = testSM.alufn[3:0];
+    
+    //connect inputs to shifter module
+    shifter.a = testSM.a;
+    shifter.b = testSM.b[2:0];
+    shifter.alufn = testSM.alufn[1:0];
+    
+    //determine which operation to perform based on 2 most significant bits of ALUFN    
+    case (testSM.alufn[5:4]){
+      2b00:
+        result = addSubtract.out;
+      
+      2b01:
+        result = bool.out;
+      
+      2b10:
+        result = shifter.out;
+      
+      2b11:
+        result = comparator.out;
+      
+      default:
+        result = 8b00;  
+    }
+    testSM.result = result; //feed output back into state machine for checking
+    
+    //default values
     led = 8h00;             // turn LEDs off
     spi_miso = bz;          // not using SPI
     spi_channel = bzzzz;    // not using flags
@@ -38,5 +93,21 @@ module mojo_top (
     io_led = 3x{{8h00}};    // turn LEDs off
     io_seg = 8hff;          // turn segments off
     io_sel = 4hf;           // select no digits
+    
+    //use LEDs to display A, B, output and ALUFN
+    led[5:0] = testSM.alufn;
+    io_led[2] = 8x{testSM.a};
+    io_led[1] = 8x{testSM.b};
+    io_led[0] = result;
+    
+    //flash ERROR in hexspeak on LEDs (0xE1212012) on LEDS if error occurs
+    if (testSM.error){
+      errorCounter.d = errorCounter.q +1; //increment counter every cycle during error
+      io_led[2] = 8hE1*errorCounter.q[23];
+      io_led[1] = 8h21*errorCounter.q[23];
+      io_led[0] = 8h20*errorCounter.q[23];
+      led = 8h12;
+    }
+    
   }
 }
