@@ -6,6 +6,6 @@ module bool (
   ) {
 
   always {
-    out = 32hFFFFFFFF;
+    out = 8hFF;
   }
 }
