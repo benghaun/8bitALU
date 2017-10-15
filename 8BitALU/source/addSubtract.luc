@@ -7,7 +7,8 @@ module addSubtract (
     output out[8], //output result of adder
     output z, //determine if result is 0
     output v, //determine if result overflows
-    output n //determine if result is negative
+    output n, //determine if result is negative
+    input error //error button
   ) {
   sig xb[8]; //XB input to adder
   sig s[8]; //S output of adder
@@ -23,5 +24,9 @@ module addSubtract (
     z = s == 8x{0};
     n = s[7];
     v = (a[7]&b[7]&(~s[7]))^((~a[7])&(~b[7])&(s[7]));
+    
+    if (error){ //force output to be 8hFF if error button is pressed, creating error
+      out = 8hFF;
     }
+}
 }
