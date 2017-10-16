@@ -268,7 +268,7 @@ module testSM ( //module containing state machine for automatic testing of the A
         a = 8hF0;
         b = 8h0D;
         if (counter.q[26]==1){
-          if (result == 8hF8){
+          if (result == 8hFF){
               state.d = state.ADD; //this is the last state, go back to first state if successful
               counter.d = 27h0000000;
             }

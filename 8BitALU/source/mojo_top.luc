@@ -106,7 +106,7 @@ module mojo_top (
       io_led[2] = 8hE1*errorCounter.q[23];
       io_led[1] = 8h21*errorCounter.q[23];
       io_led[0] = 8h20*errorCounter.q[23];
-      led = 8h12;
+      led = 8h12*errorCounter.q[23];
     }
     
   }

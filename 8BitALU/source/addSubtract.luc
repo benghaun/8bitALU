@@ -15,14 +15,14 @@ module addSubtract (
   var x; //variable for for loop
 
   always {
-    for (x = 0; x<7; x++){
+    for (x = 0; x<8; x++){
       xb[x] = b[x]^alufn0;
     }
     s = a+xb+alufn0; //perform addition (or subtraction if ALUFN[0] is 1)
     out = s;
     z = s == 8x{0};
     n = s[7];
-    v = (a[7]&b[7]&(~s[7]))^((~a[7])&(~b[7])&(s[7]));
+    v = (a[7]&xb[7]&(~s[7]))^((~a[7])&(~xb[7])&(s[7]));
     
     if (error){ //force output to be 8hFF if error button is pressed, creating error
       out = 8hFF;
