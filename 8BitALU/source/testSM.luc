@@ -6,12 +6,20 @@ module testSM ( //module containing state machine for automatic testing of the A
     output a[8],
     output b[8],
     input pause, //check if pause button is pressed
-    output error //output to indicate if there the error state is reached
+    output error, //output to indicate if there the error state is reached
+    output errorA[8], //outputs that show the values of A, B, ALUFN and the result of the operation where the error occured
+    output errorB[8],
+    output errorResult[8],
+    output errorAlufn[8]
   ) {
 .clk(clk){
   .rst(rst){
     dff counter[27]; //counter to keep track of time
     fsm state = {ADD,ADDV,ADDZ,SUB,SUBZ,CMPEQT,CMPEQF,CMPLTT,CMPLTF,CMPLET,CMPLEF,AND,OR,XOR,A,SHL,SHR,SRA,ERROR}; //different states to test different functions of ALU
+    dff error_a[8]; //dffs that store the value of A, B and the result where an error occurs, helps for debugging errors
+    dff error_b[8];
+    dff error_result[8];
+    dff error_alufn[8];
     }
   }
   always {
@@ -33,8 +41,12 @@ module testSM ( //module containing state machine for automatic testing of the A
           state.d = state.ADDV;
           counter.d = 27h0000000; //reset counter to 0
           }
-          else{ //go to error state if result is wrong
+          else{ //go to error state if result is wrong, store values of a, b and d in flip flop
           state.d = state.ERROR;
+          error_a.d = 8h1E;
+          error_b.d = 8h37;
+          error_result.d = result;
+          error_alufn.d = 6b000000;
         }
         }
       
@@ -49,6 +61,10 @@ module testSM ( //module containing state machine for automatic testing of the A
             }  
           else{
             state.d = state.ERROR;
+            error_a.d = 8hF1;
+            error_b.d = 8hEE;
+            error_result.d = result;
+            error_alufn.d = 6b000000;
             }
         }
         
@@ -63,6 +79,10 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
           else{
             state.d = state.ERROR;
+            error_a.d = 8h00;
+            error_b.d = 8h00;
+            error_result.d = result;
+            error_alufn.d = 6b000000;
           }
         }
         
@@ -77,6 +97,10 @@ module testSM ( //module containing state machine for automatic testing of the A
             }  
           else{
             state.d = state.ERROR;
+            error_a.d = 8h55;
+            error_b.d = 8h1E;
+            error_result.d = result;
+            error_alufn.d = 6b000001;
             }
         }
         
@@ -91,6 +115,10 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
           else{
             state.d = state.ERROR;
+            error_a.d = 8h00;
+            error_b.d = 8h00;
+            error_result.d = result;
+            error_alufn.d = 6b000001;
           }
         }
       
@@ -105,6 +133,10 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
           else{
             state.d = state.ERROR;
+            error_a.d = 8hE0;
+            error_b.d = 8hE0;
+            error_result.d = result;
+            error_alufn.d = 6b110011;
           }
         }
         
@@ -120,6 +152,10 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
           else{
             state.d = state.ERROR;
+            error_a.d = 8hFE;
+            error_b.d = 8hE1;
+            error_result.d = result;
+            error_alufn.d = 6b110011;
           }
         }
         
@@ -134,6 +170,10 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
           else{
             state.d = state.ERROR;
+            error_a.d = 8h1E;
+            error_b.d = 8h55;
+            error_result.d = result;
+            error_alufn.d = 6b110101;
           }
         }
        
@@ -148,6 +188,10 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
           else{
             state.d = state.ERROR;
+            error_a.d = 8hDE;
+            error_b.d = 8hAD;
+            error_result.d = result;
+            error_alufn.d = 6b110101;
           }
         }
         
@@ -162,6 +206,10 @@ module testSM ( //module containing state machine for automatic testing of the A
           }
           else{
             state.d = state.ERROR;
+            error_a.d = 8hC0;
+            error_b.d = 8hC0;
+            error_result.d = result;
+            error_alufn.d = 6b110111;
           }
         }
         
@@ -176,6 +224,10 @@ module testSM ( //module containing state machine for automatic testing of the A
             }
             else{
               state.d = state.ERROR;
+              error_a.d = 8hFE;
+              error_b.d = 8hED;
+              error_result.d = result;
+              error_alufn.d = 6b110111;
           }
         }
     
@@ -190,6 +242,10 @@ module testSM ( //module containing state machine for automatic testing of the A
             }
             else{
               state.d = state.ERROR;
+              error_a.d = 8b10010110;
+              error_b.d = 8b00110101;
+              error_result.d = result;
+              error_alufn.d = 6b011000;
           }
         }
         
@@ -204,6 +260,10 @@ module testSM ( //module containing state machine for automatic testing of the A
             }
             else{
               state.d = state.ERROR;
+              error_a.d = 8b10110010;
+              error_b.d = 8b00110100;
+              error_result.d = result;
+              error_alufn.d = 6b011110;
           }
         }
         
@@ -218,6 +278,10 @@ module testSM ( //module containing state machine for automatic testing of the A
             }
             else{
               state.d = state.ERROR;
+              error_a.d = 8b11010110;
+              error_b.d = 8b01100101;
+              error_result.d = result;
+              error_alufn.d = 6b010110;
           }
         }
         
@@ -232,6 +296,10 @@ module testSM ( //module containing state machine for automatic testing of the A
             }
             else{
               state.d = state.ERROR;
+              error_a.d = 8b01100110;
+              error_b.d = 8b11011100;
+              error_result.d = result;
+              error_alufn.d = 6b011010;
           }
         }
         
@@ -246,6 +314,10 @@ module testSM ( //module containing state machine for automatic testing of the A
             }
             else{
               state.d = state.ERROR;
+              error_a.d = 8h1E;
+              error_b.d = 8hff;
+              error_result.d = result;
+              error_alufn.d = 6b100000;
           }
         }
         
@@ -260,6 +332,10 @@ module testSM ( //module containing state machine for automatic testing of the A
             }
             else{
               state.d = state.ERROR;
+              error_a.d = 8hFA;
+              error_b.d = 8h11;
+              error_result.d = result;
+              error_alufn.d = 6b100001;
           }
         }
         
@@ -274,18 +350,22 @@ module testSM ( //module containing state machine for automatic testing of the A
             }
             else{
               state.d = state.ERROR;
+              error_a.d = 8h1E;
+              error_b.d = 8hff;
+              error_result.d = result;
+              error_alufn.d = 6b100011;
           }
         }
         
       state.ERROR: //error state
         error = 1; //indicate that error state has been reached
         
+     
+      }
+    errorA = error_a.q; //output values of a, b, alufn and result where error occured
+    errorB = error_b.q;
+    errorResult = error_result.q;
+    errorAlufn = error_alufn.q;
         
-        
-      
-        
-      
-  
-}
 }
 }

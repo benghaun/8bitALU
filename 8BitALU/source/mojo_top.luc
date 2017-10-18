@@ -96,17 +96,17 @@ module mojo_top (
     
     //use LEDs to display A, B, output and ALUFN
     led[5:0] = testSM.alufn;
-    io_led[2] = 8x{testSM.a};
-    io_led[1] = 8x{testSM.b};
+    io_led[2] = testSM.a;
+    io_led[1] = testSM.b;
     io_led[0] = result;
     
-    //flash ERROR in hexspeak on LEDs (0xE1212012) on LEDS if error occurs
+    //flash the values of a, b ,alufn and result on the LEDs when an error occurs
     if (testSM.error){
       errorCounter.d = errorCounter.q +1; //increment counter every cycle during error
-      io_led[2] = 8hE1*errorCounter.q[23];
-      io_led[1] = 8h21*errorCounter.q[23];
-      io_led[0] = 8h20*errorCounter.q[23];
-      led = 8h12*errorCounter.q[23];
+      io_led[2] = testSM.errorA*errorCounter.q[23];
+      io_led[1] = testSM.errorB*errorCounter.q[23];
+      io_led[0] = testSM.errorResult*errorCounter.q[23];
+      led = testSM.errorAlufn*errorCounter.q[23];
     }
     
   }
