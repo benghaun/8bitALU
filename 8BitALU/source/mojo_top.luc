@@ -20,6 +20,9 @@ module mojo_top (
   
   sig rst;       //reset signal
   sig result[8]; //signal to store the value of the output from alu
+  sig alufn[6]; //alufn signal
+  sig a[8]; //signal for inputs a and b
+  sig b[8];
   
   .clk(clk) {
     // The reset conditioner is used to synchronize the reset signal to the FPGA
@@ -41,41 +44,59 @@ module mojo_top (
     reset_cond.in = ~rst_n; // input raw inverted reset signal
     rst = reset_cond.out;   // conditioned reset
     
+    //setup for manual testing, which is activated by one of the switches (io_dip[0][7]) on the io shield
+    //three rows of 8 switches: first row for a, second row for b, last 6 switches on third row for alufn
+    if (io_dip[0][7] == 1){ 
+      //set alufn, a and b to be controlled by switches
+      alufn = io_dip[0][5:0];
+      a = io_dip[2];
+      b = io_dip[1];
+    }
+    //setup for automatic testing
+    else{
+      //set a,b and alufn to be determined by state machine outputs
+      a = testSM.a;
+      b = testSM.b;
+      alufn = testSM.alufn;
+    }
     //connect pause button to middle button in io shield
     testSM.pause = io_button[1];
     
     //connect inputs to adder module
-    addSubtract.a = testSM.a;
-    addSubtract.b = testSM.b;
-    addSubtract.alufn0 = testSM.alufn[0];
+    addSubtract.a = a;
+    addSubtract.b = b;
+    addSubtract.alufn0 = alufn[0];
     addSubtract.error = io_button[0]; //button to press to cause error in adder
     
     //connect comparator to adder outputs
     comparator.z = addSubtract.z; 
     comparator.n = addSubtract.n;
     comparator.v = addSubtract.v;
-    comparator.alufn = testSM.alufn[2:1];
+    comparator.alufn = alufn[2:1];
     comparator.error = io_button[0]; //button to press to cause error in adder
     
     //connect inputs to bool moudule
-    bool.a = testSM.a;
-    bool.b = testSM.b;
-    bool.alufn = testSM.alufn[3:0];
+    bool.a = a;
+    bool.b = b;
+    bool.alufn = alufn[3:0];
     bool.error = io_button[0]; //button to press to cause error in adder
     
     //connect inputs to shifter module
-    shifter.a = testSM.a;
-    shifter.b = testSM.b[2:0];
-    shifter.alufn = testSM.alufn[1:0];
+    shifter.a = a;
+    shifter.b = b[2:0];
+    shifter.alufn = alufn[1:0];
     shifter.error = io_button[0]; //button to press to cause error in adder
     
     //connect inputs to multiplier module
-    multiplier.a = testSM.a;
-    multiplier.b = testSM.b;
+    multiplier.a = a;
+    multiplier.b = b;
     multiplier.error = io_button[0]; //button to press to cause error in adder
     
+         
+    
+    
     //determine which operation to perform based on 2 most significant bits of ALUFN    
-    case (testSM.alufn[5:4]){
+    case (alufn[5:4]){
       2b00:
         result = addSubtract.out;
         if (testSM.alufn[1:0] == 2b10){
@@ -108,13 +129,13 @@ module mojo_top (
     io_sel = 4hf;           // select no digits
     
     //use LEDs to display A, B, output and ALUFN
-    led[5:0] = testSM.alufn;
-    io_led[2] = testSM.a;
-    io_led[1] = testSM.b;
+    led[5:0] = alufn;
+    io_led[2] = a;
+    io_led[1] = b;
     io_led[0] = result;
     
-    //flash the values of a, b ,alufn and result on the LEDs when an error occurs
-    if (testSM.error){
+    //flash the values of a, b ,alufn and result on the LEDs when an error in the state machine occurs
+    if (testSM.error && io_dip[0][7] == 0){
       errorCounter.d = errorCounter.q +1; //increment counter every cycle during error
       io_led[2] = testSM.errorA*errorCounter.q[23];
       io_led[1] = testSM.errorB*errorCounter.q[23];
