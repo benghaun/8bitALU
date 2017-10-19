@@ -30,6 +30,12 @@ module mojo_top_0 (
   
   reg [7:0] result;
   
+  reg [5:0] alufn;
+  
+  reg [7:0] a;
+  
+  reg [7:0] b;
+  
   wire [1-1:0] M_reset_cond_out;
   reg [1-1:0] M_reset_cond_in;
   reset_conditioner_1 reset_cond (
@@ -139,29 +145,38 @@ module mojo_top_0 (
     
     M_reset_cond_in = ~rst_n;
     rst = M_reset_cond_out;
+    if (io_dip[0+7+0-:1] == 1'h1) begin
+      alufn = io_dip[0+0+5-:6];
+      a = io_dip[16+7-:8];
+      b = io_dip[8+7-:8];
+    end else begin
+      a = M_testSM_a;
+      b = M_testSM_b;
+      alufn = M_testSM_alufn;
+    end
     M_testSM_pause = io_button[1+0-:1];
-    M_addSubtract_a = M_testSM_a;
-    M_addSubtract_b = M_testSM_b;
-    M_addSubtract_alufn0 = M_testSM_alufn[0+0-:1];
+    M_addSubtract_a = a;
+    M_addSubtract_b = b;
+    M_addSubtract_alufn0 = alufn[0+0-:1];
     M_addSubtract_error = io_button[0+0-:1];
     M_comparator_z = M_addSubtract_z;
     M_comparator_n = M_addSubtract_n;
     M_comparator_v = M_addSubtract_v;
-    M_comparator_alufn = M_testSM_alufn[1+1-:2];
+    M_comparator_alufn = alufn[1+1-:2];
     M_comparator_error = io_button[0+0-:1];
-    M_bool_a = M_testSM_a;
-    M_bool_b = M_testSM_b;
-    M_bool_alufn = M_testSM_alufn[0+3-:4];
+    M_bool_a = a;
+    M_bool_b = b;
+    M_bool_alufn = alufn[0+3-:4];
     M_bool_error = io_button[0+0-:1];
-    M_shifter_a = M_testSM_a;
-    M_shifter_b = M_testSM_b[0+2-:3];
-    M_shifter_alufn = M_testSM_alufn[0+1-:2];
+    M_shifter_a = a;
+    M_shifter_b = b[0+2-:3];
+    M_shifter_alufn = alufn[0+1-:2];
     M_shifter_error = io_button[0+0-:1];
-    M_multiplier_a = M_testSM_a;
-    M_multiplier_b = M_testSM_b;
+    M_multiplier_a = a;
+    M_multiplier_b = b;
     M_multiplier_error = io_button[0+0-:1];
     
-    case (M_testSM_alufn[4+1-:2])
+    case (alufn[4+1-:2])
       2'h0: begin
         result = M_addSubtract_out;
         if (M_testSM_alufn[0+1-:2] == 2'h2) begin
@@ -189,11 +204,11 @@ module mojo_top_0 (
     io_led = 24'h000000;
     io_seg = 8'hff;
     io_sel = 4'hf;
-    led[0+5-:6] = M_testSM_alufn;
-    io_led[16+7-:8] = M_testSM_a;
-    io_led[8+7-:8] = M_testSM_b;
+    led[0+5-:6] = alufn;
+    io_led[16+7-:8] = a;
+    io_led[8+7-:8] = b;
     io_led[0+7-:8] = result;
-    if (M_testSM_error) begin
+    if (M_testSM_error && io_dip[0+7+0-:1] == 1'h0) begin
       M_errorCounter_d = M_errorCounter_q + 1'h1;
       io_led[16+7-:8] = M_testSM_errorA * M_errorCounter_q[23+0-:1];
       io_led[8+7-:8] = M_testSM_errorB * M_errorCounter_q[23+0-:1];

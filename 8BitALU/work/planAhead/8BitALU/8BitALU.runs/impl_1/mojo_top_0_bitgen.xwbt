@@ -1,8 +1,8 @@
 INTSTYLE=pa
-INFILE=C:\Users\user\Documents\GitHub\8bitALU\8BitALU\work\planAhead\8BitALU\8BitALU.runs\impl_1\mojo_top_0_routed.ncd
-OUTFILE=C:\Users\user\Documents\GitHub\8bitALU\8BitALU\work\planAhead\8BitALU\8BitALU.runs\impl_1\mojo_top_0.bit
+INFILE=D:\OneDrive - Singapore University of Technology and Design\work\SUTD\50.002 Computation Structures\Mojo\8bitALU\8BitALU\work\planAhead\8BitALU\8BitALU.runs\impl_1\mojo_top_0_routed.ncd
+OUTFILE=D:\OneDrive - Singapore University of Technology and Design\work\SUTD\50.002 Computation Structures\Mojo\8bitALU\8BitALU\work\planAhead\8BitALU\8BitALU.runs\impl_1\mojo_top_0.bit
 FAMILY=Spartan6
 PART=xc6slx9-2tqg144
-WORKINGDIR=C:\Users\user\Documents\GitHub\8bitALU\8BitALU\work\planAhead\8BitALU\8BitALU.runs\impl_1
+WORKINGDIR=D:\OneDrive - Singapore University of Technology and Design\work\SUTD\50.002 Computation Structures\Mojo\8bitALU\8BitALU\work\planAhead\8BitALU\8BitALU.runs\impl_1
 LICENSE=WebPack
-USER_INFO=211420139_0_0_819
+USER_INFO=211405057_0_0_358
