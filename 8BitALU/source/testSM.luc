@@ -15,7 +15,7 @@ module testSM ( //module containing state machine for automatic testing of the A
 .clk(clk){
   .rst(rst){
     dff counter[27]; //counter to keep track of time
-    fsm state = {ADD,ADDV,ADDZ,SUB,SUBZ,CMPEQT,CMPEQF,CMPLTT,CMPLTF,CMPLET,CMPLEF,AND,OR,XOR,A,SHL,SHR,SRA,ERROR}; //different states to test different functions of ALU
+    fsm state = {ADD,ADDV,ADDZ,SUB,SUBZ,CMPEQT,CMPEQF,CMPLTT,CMPLTF,CMPLET,CMPLEF,AND,OR,XOR,A,SHL,SHR,SRA,MULPP,MULV,MULNN,MULNP,ERROR}; //different states to test different functions of ALU
     dff error_a[8]; //dffs that store the value of A, B and the result where an error occurs, helps for debugging errors
     dff error_b[8];
     dff error_result[8];
@@ -355,6 +355,82 @@ module testSM ( //module containing state machine for automatic testing of the A
               error_result.d = result;
               error_alufn.d = 6b100011;
           }
+        }
+      
+      state.MULPP: //multiplication of two positive numbers without overflow
+        alufn = 6b000010;
+        a = 8h04;
+        a = 8h05;
+        
+        if (counter.q[26]==1){
+            if (result == 8h14){
+              state.d = state.MULV;
+              counter.d = 27h0000000;
+            }
+            else{
+              state.d = state.ERROR;
+              error_a.d = 8h04;
+              error_b.d = 8h05;
+              error_result.d = result;
+              error_alufn.d = 6b000010;
+           }
+        }
+        
+      state.MULV: //multiplication of two positive numbers with overflow
+        alufn = 6b000010;
+        a = 8h20;
+        a = 8h1E;
+        
+        if (counter.q[26]==1){
+            if (result == 8hC0){
+              state.d = state.MULNN;
+              counter.d = 27h0000000;
+            }
+            else{
+              state.d = state.ERROR;
+              error_a.d = 8h20;
+              error_b.d = 8h1E;
+              error_result.d = result;
+              error_alufn.d = 6b000010;
+           }
+        }
+        
+      state.MULNN: //multiplication of two negative numbers
+        alufn = 6b000010;
+        a = 8hFC;
+        a = 8hFB;
+        
+        if (counter.q[26]==1){
+            if (result == 8h14){ 
+              state.d = state.MULNP;
+              counter.d = 27h0000000;
+            }
+            else{
+              state.d = state.ERROR;
+              error_a.d = 8hFC;
+              error_b.d = 8hFB;
+              error_result.d = result;
+              error_alufn.d = 6b000010;
+           }
+        }
+        
+      state.MULNP: //multiplication of one positive and one negative number
+        alufn = 6b000010;
+        a = 8hB0;
+        a = 8h01;
+        
+        if (counter.q[26]==1){
+            if (result == 8hB0){ 
+              state.d = state.MULNP;
+              counter.d = 27h0000000;
+            }
+            else{
+              state.d = state.ERROR;
+              error_a.d = 8hB0;
+              error_b.d = 8h01;
+              error_result.d = result;
+              error_alufn.d = 6b000010;
+           }
         }
         
       state.ERROR: //error state
