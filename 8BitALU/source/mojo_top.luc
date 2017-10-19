@@ -55,21 +55,24 @@ module mojo_top (
     comparator.n = addSubtract.n;
     comparator.v = addSubtract.v;
     comparator.alufn = testSM.alufn[2:1];
+    comparator.error = io_button[0]; //button to press to cause error in adder
     
     //connect inputs to bool moudule
     bool.a = testSM.a;
     bool.b = testSM.b;
     bool.alufn = testSM.alufn[3:0];
+    bool.error = io_button[0]; //button to press to cause error in adder
     
     //connect inputs to shifter module
     shifter.a = testSM.a;
     shifter.b = testSM.b[2:0];
     shifter.alufn = testSM.alufn[1:0];
+    shifter.error = io_button[0]; //button to press to cause error in adder
     
     //connect inputs to multiplier module
     multiplier.a = testSM.a;
     multiplier.b = testSM.b;
-    multiplier.alufn = testSM.alufn;
+    multiplier.error = io_button[0]; //button to press to cause error in adder
     
     //determine which operation to perform based on 2 most significant bits of ALUFN    
     case (testSM.alufn[5:4]){
@@ -78,7 +81,6 @@ module mojo_top (
         if (testSM.alufn[1:0] == 2b10){
           result = multiplier.out;
         }
-        
       2b01:
         result = bool.out;
       
@@ -91,6 +93,7 @@ module mojo_top (
       default:
         result = 8b00;  
     }
+   
     
     testSM.result = result; //feed output back into state machine for checking
     

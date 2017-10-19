@@ -345,7 +345,7 @@ module testSM ( //module containing state machine for automatic testing of the A
         b = 8h0D;
         if (counter.q[26]==1){
           if (result == 8hFF){
-              state.d = state.ADD; //this is the last state, go back to first state if successful
+              state.d = state.MULPP; //this is the last state, go back to first state if successful
               counter.d = 27h0000000;
             }
             else{
@@ -360,7 +360,7 @@ module testSM ( //module containing state machine for automatic testing of the A
       state.MULPP: //multiplication of two positive numbers without overflow
         alufn = 6b000010;
         a = 8h04;
-        a = 8h05;
+        b = 8h05;
         
         if (counter.q[26]==1){
             if (result == 8h14){
@@ -379,7 +379,7 @@ module testSM ( //module containing state machine for automatic testing of the A
       state.MULV: //multiplication of two positive numbers with overflow
         alufn = 6b000010;
         a = 8h20;
-        a = 8h1E;
+        b = 8h1E;
         
         if (counter.q[26]==1){
             if (result == 8hC0){
@@ -398,7 +398,7 @@ module testSM ( //module containing state machine for automatic testing of the A
       state.MULNN: //multiplication of two negative numbers
         alufn = 6b000010;
         a = 8hFC;
-        a = 8hFB;
+        b = 8hFB;
         
         if (counter.q[26]==1){
             if (result == 8h14){ 
@@ -417,11 +417,11 @@ module testSM ( //module containing state machine for automatic testing of the A
       state.MULNP: //multiplication of one positive and one negative number
         alufn = 6b000010;
         a = 8hB0;
-        a = 8h01;
+        b = 8h01;
         
         if (counter.q[26]==1){
             if (result == 8hB0){ 
-              state.d = state.MULNP;
+              state.d = state.ADD;
               counter.d = 27h0000000;
             }
             else{

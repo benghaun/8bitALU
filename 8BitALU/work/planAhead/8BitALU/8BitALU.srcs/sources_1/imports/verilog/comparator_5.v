@@ -9,7 +9,8 @@ module comparator_5 (
     input n,
     input v,
     input [1:0] alufn,
-    output reg out
+    output reg [7:0] out,
+    input error
   );
   
   
@@ -24,6 +25,9 @@ module comparator_5 (
     end
     if (alufn == 2'h3) begin
       out = z | (n ^ v);
+    end
+    if (error) begin
+      out = 8'hff;
     end
   end
 endmodule

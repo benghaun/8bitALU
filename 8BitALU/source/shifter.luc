@@ -2,7 +2,8 @@ module shifter (
     input alufn[2], //2-bit alufn input signal specifically ALUFN0 and ALUFN1  
     input a[8],     //8-bit input A
     input b[3],     //4-bit input B 
-    output out[8]   //8-bit output out\
+    output out[8],   //8-bit output out\
+    input error //error button
   ) {
 
   
@@ -16,5 +17,9 @@ module shifter (
       2b11: out = $signed(a) >>> b;  //ALUFN[1:0] = 11 corresponds to signed right shift
       default: out = a;              //default output     
     }
+    if (error){ //force output to be 8hFF if error button is pressed, creating error
+      out = 8hFF;
+    }
   }
+  
 }

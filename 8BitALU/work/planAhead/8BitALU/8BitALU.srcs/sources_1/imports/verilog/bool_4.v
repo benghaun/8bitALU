@@ -8,7 +8,8 @@ module bool_4 (
     input [3:0] alufn,
     input [7:0] a,
     input [7:0] b,
-    output reg [7:0] out
+    output reg [7:0] out,
+    input error
   );
   
   
@@ -32,5 +33,8 @@ module bool_4 (
         out = 8'h00;
       end
     endcase
+    if (error) begin
+      out = 8'hff;
+    end
   end
 endmodule

@@ -3,6 +3,7 @@
   <files>
     <src>bool.luc</src>
     <src>testSM.luc</src>
+    <src>multiplier.luc</src>
     <src>shifter.luc</src>
     <src>addSubtract.luc</src>
     <src top="true">mojo_top.luc</src>

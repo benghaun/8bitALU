@@ -12,7 +12,11 @@ module testSM_2 (
     output reg [7:0] a,
     output reg [7:0] b,
     input pause,
-    output reg error
+    output reg error,
+    output reg [7:0] errorA,
+    output reg [7:0] errorB,
+    output reg [7:0] errorResult,
+    output reg [7:0] errorAlufn
   );
   
   
@@ -36,13 +40,25 @@ module testSM_2 (
   localparam SHL_state = 5'd15;
   localparam SHR_state = 5'd16;
   localparam SRA_state = 5'd17;
-  localparam ERROR_state = 5'd18;
+  localparam MULPP_state = 5'd18;
+  localparam MULV_state = 5'd19;
+  localparam MULNN_state = 5'd20;
+  localparam MULNP_state = 5'd21;
+  localparam ERROR_state = 5'd22;
   
   reg [4:0] M_state_d, M_state_q = ADD_state;
+  reg [7:0] M_error_a_d, M_error_a_q = 1'h0;
+  reg [7:0] M_error_b_d, M_error_b_q = 1'h0;
+  reg [7:0] M_error_result_d, M_error_result_q = 1'h0;
+  reg [7:0] M_error_alufn_d, M_error_alufn_q = 1'h0;
   
   always @* begin
     M_state_d = M_state_q;
+    M_error_alufn_d = M_error_alufn_q;
     M_counter_d = M_counter_q;
+    M_error_result_d = M_error_result_q;
+    M_error_b_d = M_error_b_q;
+    M_error_a_d = M_error_a_q;
     
     alufn = 6'h00;
     a = 8'h00;
@@ -63,6 +79,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'h1e;
+            M_error_b_d = 8'h37;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h00;
           end
         end
       end
@@ -76,6 +96,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'hf1;
+            M_error_b_d = 8'hee;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h00;
           end
         end
       end
@@ -89,6 +113,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'h00;
+            M_error_b_d = 8'h00;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h00;
           end
         end
       end
@@ -102,6 +130,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'h55;
+            M_error_b_d = 8'h1e;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h01;
           end
         end
       end
@@ -115,6 +147,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'h00;
+            M_error_b_d = 8'h00;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h01;
           end
         end
       end
@@ -128,6 +164,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'he0;
+            M_error_b_d = 8'he0;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h33;
           end
         end
       end
@@ -141,6 +181,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'hfe;
+            M_error_b_d = 8'he1;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h33;
           end
         end
       end
@@ -154,6 +198,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'h1e;
+            M_error_b_d = 8'h55;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h35;
           end
         end
       end
@@ -167,6 +215,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'hde;
+            M_error_b_d = 8'had;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h35;
           end
         end
       end
@@ -180,6 +232,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'hc0;
+            M_error_b_d = 8'hc0;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h37;
           end
         end
       end
@@ -193,6 +249,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'hfe;
+            M_error_b_d = 8'hed;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h37;
           end
         end
       end
@@ -206,6 +266,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'h96;
+            M_error_b_d = 8'h35;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h18;
           end
         end
       end
@@ -219,6 +283,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'hb2;
+            M_error_b_d = 8'h34;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h1e;
           end
         end
       end
@@ -232,6 +300,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'hd6;
+            M_error_b_d = 8'h65;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h16;
           end
         end
       end
@@ -245,6 +317,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'h66;
+            M_error_b_d = 8'hdc;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h1a;
           end
         end
       end
@@ -258,6 +334,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'h1e;
+            M_error_b_d = 8'hff;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h20;
           end
         end
       end
@@ -271,6 +351,10 @@ module testSM_2 (
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'hfa;
+            M_error_b_d = 8'h11;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h21;
           end
         end
       end
@@ -280,10 +364,82 @@ module testSM_2 (
         b = 8'h0d;
         if (M_counter_q[26+0-:1] == 1'h1) begin
           if (result == 8'hff) begin
+            M_state_d = MULPP_state;
+            M_counter_d = 27'h0000000;
+          end else begin
+            M_state_d = ERROR_state;
+            M_error_a_d = 8'h1e;
+            M_error_b_d = 8'hff;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h23;
+          end
+        end
+      end
+      MULPP_state: begin
+        alufn = 6'h02;
+        a = 8'h04;
+        b = 8'h05;
+        if (M_counter_q[26+0-:1] == 1'h1) begin
+          if (result == 8'h14) begin
+            M_state_d = MULV_state;
+            M_counter_d = 27'h0000000;
+          end else begin
+            M_state_d = ERROR_state;
+            M_error_a_d = 8'h04;
+            M_error_b_d = 8'h05;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h02;
+          end
+        end
+      end
+      MULV_state: begin
+        alufn = 6'h02;
+        a = 8'h20;
+        b = 8'h1e;
+        if (M_counter_q[26+0-:1] == 1'h1) begin
+          if (result == 8'hc0) begin
+            M_state_d = MULNN_state;
+            M_counter_d = 27'h0000000;
+          end else begin
+            M_state_d = ERROR_state;
+            M_error_a_d = 8'h20;
+            M_error_b_d = 8'h1e;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h02;
+          end
+        end
+      end
+      MULNN_state: begin
+        alufn = 6'h02;
+        a = 8'hfc;
+        b = 8'hfb;
+        if (M_counter_q[26+0-:1] == 1'h1) begin
+          if (result == 8'h14) begin
+            M_state_d = MULNP_state;
+            M_counter_d = 27'h0000000;
+          end else begin
+            M_state_d = ERROR_state;
+            M_error_a_d = 8'hfc;
+            M_error_b_d = 8'hfb;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h02;
+          end
+        end
+      end
+      MULNP_state: begin
+        alufn = 6'h02;
+        a = 8'hb0;
+        b = 8'h01;
+        if (M_counter_q[26+0-:1] == 1'h1) begin
+          if (result == 8'hb0) begin
             M_state_d = ADD_state;
             M_counter_d = 27'h0000000;
           end else begin
             M_state_d = ERROR_state;
+            M_error_a_d = 8'hb0;
+            M_error_b_d = 8'h01;
+            M_error_result_d = result;
+            M_error_alufn_d = 6'h02;
           end
         end
       end
@@ -291,14 +447,26 @@ module testSM_2 (
         error = 1'h1;
       end
     endcase
+    errorA = M_error_a_q;
+    errorB = M_error_b_q;
+    errorResult = M_error_result_q;
+    errorAlufn = M_error_alufn_q;
   end
   
   always @(posedge clk) begin
     if (rst == 1'b1) begin
       M_counter_q <= 1'h0;
+      M_error_a_q <= 1'h0;
+      M_error_b_q <= 1'h0;
+      M_error_result_q <= 1'h0;
+      M_error_alufn_q <= 1'h0;
       M_state_q <= 1'h0;
     end else begin
       M_counter_q <= M_counter_d;
+      M_error_a_q <= M_error_a_d;
+      M_error_b_q <= M_error_b_d;
+      M_error_result_q <= M_error_result_d;
+      M_error_alufn_q <= M_error_alufn_d;
       M_state_q <= M_state_d;
     end
   end

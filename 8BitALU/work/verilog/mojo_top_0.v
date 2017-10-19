@@ -41,6 +41,10 @@ module mojo_top_0 (
   wire [8-1:0] M_testSM_a;
   wire [8-1:0] M_testSM_b;
   wire [1-1:0] M_testSM_error;
+  wire [8-1:0] M_testSM_errorA;
+  wire [8-1:0] M_testSM_errorB;
+  wire [8-1:0] M_testSM_errorResult;
+  wire [8-1:0] M_testSM_errorAlufn;
   reg [8-1:0] M_testSM_result;
   reg [1-1:0] M_testSM_pause;
   testSM_2 testSM (
@@ -51,7 +55,11 @@ module mojo_top_0 (
     .alufn(M_testSM_alufn),
     .a(M_testSM_a),
     .b(M_testSM_b),
-    .error(M_testSM_error)
+    .error(M_testSM_error),
+    .errorA(M_testSM_errorA),
+    .errorB(M_testSM_errorB),
+    .errorResult(M_testSM_errorResult),
+    .errorAlufn(M_testSM_errorAlufn)
   );
   reg [23:0] M_errorCounter_d, M_errorCounter_q = 1'h0;
   
@@ -78,23 +86,27 @@ module mojo_top_0 (
   reg [4-1:0] M_bool_alufn;
   reg [8-1:0] M_bool_a;
   reg [8-1:0] M_bool_b;
+  reg [1-1:0] M_bool_error;
   bool_4 bool (
     .alufn(M_bool_alufn),
     .a(M_bool_a),
     .b(M_bool_b),
+    .error(M_bool_error),
     .out(M_bool_out)
   );
   
-  wire [1-1:0] M_comparator_out;
+  wire [8-1:0] M_comparator_out;
   reg [1-1:0] M_comparator_z;
   reg [1-1:0] M_comparator_n;
   reg [1-1:0] M_comparator_v;
   reg [2-1:0] M_comparator_alufn;
+  reg [1-1:0] M_comparator_error;
   comparator_5 comparator (
     .z(M_comparator_z),
     .n(M_comparator_n),
     .v(M_comparator_v),
     .alufn(M_comparator_alufn),
+    .error(M_comparator_error),
     .out(M_comparator_out)
   );
   
@@ -102,11 +114,24 @@ module mojo_top_0 (
   reg [2-1:0] M_shifter_alufn;
   reg [8-1:0] M_shifter_a;
   reg [3-1:0] M_shifter_b;
+  reg [1-1:0] M_shifter_error;
   shifter_6 shifter (
     .alufn(M_shifter_alufn),
     .a(M_shifter_a),
     .b(M_shifter_b),
+    .error(M_shifter_error),
     .out(M_shifter_out)
+  );
+  
+  wire [8-1:0] M_multiplier_out;
+  reg [8-1:0] M_multiplier_a;
+  reg [8-1:0] M_multiplier_b;
+  reg [1-1:0] M_multiplier_error;
+  multiplier_7 multiplier (
+    .a(M_multiplier_a),
+    .b(M_multiplier_b),
+    .error(M_multiplier_error),
+    .out(M_multiplier_out)
   );
   
   always @* begin
@@ -123,16 +148,25 @@ module mojo_top_0 (
     M_comparator_n = M_addSubtract_n;
     M_comparator_v = M_addSubtract_v;
     M_comparator_alufn = M_testSM_alufn[1+1-:2];
+    M_comparator_error = io_button[0+0-:1];
     M_bool_a = M_testSM_a;
     M_bool_b = M_testSM_b;
     M_bool_alufn = M_testSM_alufn[0+3-:4];
+    M_bool_error = io_button[0+0-:1];
     M_shifter_a = M_testSM_a;
     M_shifter_b = M_testSM_b[0+2-:3];
     M_shifter_alufn = M_testSM_alufn[0+1-:2];
+    M_shifter_error = io_button[0+0-:1];
+    M_multiplier_a = M_testSM_a;
+    M_multiplier_b = M_testSM_b;
+    M_multiplier_error = io_button[0+0-:1];
     
     case (M_testSM_alufn[4+1-:2])
       2'h0: begin
         result = M_addSubtract_out;
+        if (M_testSM_alufn[0+1-:2] == 2'h2) begin
+          result = M_multiplier_out;
+        end
       end
       2'h1: begin
         result = M_bool_out;
@@ -156,15 +190,15 @@ module mojo_top_0 (
     io_seg = 8'hff;
     io_sel = 4'hf;
     led[0+5-:6] = M_testSM_alufn;
-    io_led[16+7-:8] = {4'h8{M_testSM_a}};
-    io_led[8+7-:8] = {4'h8{M_testSM_b}};
+    io_led[16+7-:8] = M_testSM_a;
+    io_led[8+7-:8] = M_testSM_b;
     io_led[0+7-:8] = result;
     if (M_testSM_error) begin
       M_errorCounter_d = M_errorCounter_q + 1'h1;
-      io_led[16+7-:8] = 8'he1 * M_errorCounter_q[23+0-:1];
-      io_led[8+7-:8] = 8'h21 * M_errorCounter_q[23+0-:1];
-      io_led[0+7-:8] = 8'h20 * M_errorCounter_q[23+0-:1];
-      led = 8'h12 * M_errorCounter_q[23+0-:1];
+      io_led[16+7-:8] = M_testSM_errorA * M_errorCounter_q[23+0-:1];
+      io_led[8+7-:8] = M_testSM_errorB * M_errorCounter_q[23+0-:1];
+      io_led[0+7-:8] = M_testSM_errorResult * M_errorCounter_q[23+0-:1];
+      led = M_testSM_errorAlufn * M_errorCounter_q[23+0-:1];
     end
   end
   

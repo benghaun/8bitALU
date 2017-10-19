@@ -4,11 +4,9 @@
    This is a temporary file and any changes made to it will be destroyed.
 */
 
-module comparator_5 (
-    input z,
-    input n,
-    input v,
-    input [1:0] alufn,
+module multiplier_7 (
+    input [7:0] a,
+    input [7:0] b,
     output reg [7:0] out,
     input error
   );
@@ -16,16 +14,7 @@ module comparator_5 (
   
   
   always @* begin
-    out = 1'h0;
-    if (alufn == 2'h1) begin
-      out = z;
-    end
-    if (alufn == 2'h2) begin
-      out = n ^ v;
-    end
-    if (alufn == 2'h3) begin
-      out = z | (n ^ v);
-    end
+    out = $signed(a) * $signed(b);
     if (error) begin
       out = 8'hff;
     end

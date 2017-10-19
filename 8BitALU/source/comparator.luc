@@ -3,7 +3,8 @@ module comparator (
     input n,
     input v,
     input alufn[2], //2bit ALUFN signal, specifically ALUFN[1] and ALUFN[2] 
-    output out
+    output out[8],
+    input error //error button
   ) {
 
   always {
@@ -16,7 +17,10 @@ module comparator (
     }
     if (alufn == 2b11){ //to compare A<=B
       out = z | (n^v);
-}
+    }
+    if (error){ //force output to be 8hFF if error button is pressed, creating error
+      out = 8hFF;
+    }
   }
   
 }
