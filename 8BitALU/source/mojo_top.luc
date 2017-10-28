@@ -99,7 +99,7 @@ module mojo_top (
     case (alufn[5:4]){
       2b00:
         result = addSubtract.out;
-        if (testSM.alufn[1:0] == 2b10){
+        if (alufn[1:0] == 2b10){
           result = multiplier.out;
         }
       2b01:
